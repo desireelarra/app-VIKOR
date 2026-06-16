@@ -56,8 +56,8 @@ if modo == "Agregar manualmente los datos de mi tabla":
     alternativas = [f"Opción {i+1}" for i in range(num_alt)]
     criterios = [f"Criterio {j+1}" for j in range(num_crit)]
 
-    df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombres)
-    df_vacio.insert(0, "Nombre de cada Opción", alternativas_nombres)
+    df_vacio = pd.DataFrame(0.0, index=alternativas, columns=criterios)
+    df_vacio.insert(0, "Nombre de cada Opción", alternativas)
     
     st.subheader("Llena la siguiente tabla con tus datos correspondientes")
     st.info("Esta tabla recibe el nombre de: Matriz de decisión. Haz doble clic en cualquier celda para editar el valor que le designas a cada opción dado su criterio de evaluación. No olvides agregar nombre a tus opciones.")
