@@ -16,7 +16,7 @@ import pandas as pd
 # ==========================================
 st.set_page_config(page_title="Método VIKOR", layout="wide")
 st.title("Método VIKOR")
-st.markdown("El método VIKOR es una herramienta matemática que ayuda a elegir la mejor opción cuando tienes varias alternativas y necesitas evaluar factores que compiten entre sí. Su objetivo principal es encontrar una "solución de compromiso", es decir, la opción que ofrezca el mejor equilibrio general, donde maximiza la utilidad grupal y minimiza el arrepentimiento individual.")
+st.markdown('El método VIKOR es una herramienta matemática que ayuda a elegir la mejor opción cuando tienes varias alternativas y necesitas evaluar factores que compiten entre sí. Su objetivo principal es encontrar una "solución de compromiso", es decir, la opción que ofrezca el mejor equilibrio general, donde maximiza la utilidad grupal y minimiza el arrepentimiento individual.')
 
 # ==========================================
 # BARRA LATERAL (GLOBAL)
