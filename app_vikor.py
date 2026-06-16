@@ -33,7 +33,7 @@ st.sidebar.divider()
 # ==========================================
 # SELECTOR DE MODO DE ENTRADA
 # ==========================================
-modo = st.radio("Selecciona el método de entrada de datos:", ["Ingreso Manual", "Subir Archivo Excel"], horizontal=True)
+modo = st.radio("Selecciona el método de entrada de datos:", ["Agregar manualmente los datos de mi tabla", "Subir archivo Excel (.xlsx) de mi tabla"], horizontal=True)
 st.divider()
 
 # Variables puente para conectar datos con la barra lateral y el cálculo
