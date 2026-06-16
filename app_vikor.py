@@ -15,14 +15,14 @@ import pandas as pd
 # CONFIGURACIÓN DE LA PÁGINA
 # ==========================================
 st.set_page_config(page_title="Método VIKOR", layout="wide")
-st.title("Optimización Multicriterio: Método VIKOR")
-st.markdown("El método VIKOR maximiza la utilidad grupal y minimiza el arrepentimiento individual.")
+st.title("Método VIKOR")
+st.markdown("El método VIKOR es una herramienta matemática que ayuda a elegir la mejor opción cuando tienes varias alternativas y necesitas evaluar factores que compiten entre sí. Su objetivo principal es encontrar una "solución de compromiso", es decir, la opción que ofrezca el mejor equilibrio general, donde maximiza la utilidad grupal y minimiza el arrepentimiento individual.")
 
 # ==========================================
 # BARRA LATERAL (GLOBAL)
 # ==========================================
-st.sidebar.header("Parámetro Global")
-v = st.sidebar.slider("Parámetro v (Peso de la utilidad grupal)", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
+st.sidebar.header("Valor de Utilidad grupal v")
+v = st.sidebar.slider("v es el peso de la estrategia de toma de decisiones “la mayoría de los criterios”", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
 st.sidebar.divider()
 
 st.sidebar.header("Pesos o Valor de importancia")
@@ -33,7 +33,7 @@ st.sidebar.divider()
 # ==========================================
 # SELECTOR DE MODO DE ENTRADA
 # ==========================================
-modo = st.radio("Selecciona el método de entrada de datos:", ["Ingreso Manual", "Subir Archivo Excel"], horizontal=True)
+modo = st.radio("¿Cómo prefieres ingresar los datos de tu tabla?", ["Agregar manualmente los datos de mi tabla", "Subir archivo Excel (.xlsx) de mi tabla"], horizontal=True)
 st.divider()
 
 # Variables puente
@@ -45,16 +45,22 @@ pesos_auto = None
 # ==========================================
 # MODO 1: INGRESO MANUAL
 # ==========================================
-if modo == "Ingreso Manual":
-    st.subheader("Paso 1: Definir Dimensiones y Matriz")
+if modo == "Agregar manualmente los datos de mi tabla":
+    st.write("Configura el tamaño de tu tabla dadas la cantidad de opciones y criterios de evaluación que desees. No es necesario que tu tabla tenga la misma cantidad de opciones y criterios.")
     col1, col2 = st.columns(2)
     with col1:
-        num_alt = st.number_input("Número de Alternativas", min_value=2, value=5, step=1)
+        num_alt = st.number_input("Número de Opciones (filas)", min_value=2, value=5, step=1)
     with col2:
-        num_crit = st.number_input("Número de Criterios", min_value=2, value=3, step=1)
+        num_crit = st.number_input("Número de Criterios de evaluación (columnas)", min_value=2, value=3, step=1)
 
-    alternativas = [f"A{i+1}" for i in range(num_alt)]
-    criterios = [f"C{j+1}" for j in range(num_crit)]
+    alternativas = [f"Opción {i+1}" for i in range(num_alt)]
+    criterios = [f"Criterio {j+1}" for j in range(num_crit)]
+
+    df_vacio = pd.DataFrame(0.0, index=alternativas_nombres, columns=criterios_nombres)
+    df_vacio.insert(0, "Nombre de cada Opción", alternativas_nombres)
+    
+    st.subheader("Llena la siguiente tabla con tus datos correspondientes")
+    st.info("Esta tabla recibe el nombre de: Matriz de decisión. Haz doble clic en cualquier celda para editar el valor que le designas a cada opción dado su criterio de evaluación. No olvides agregar nombre a tus opciones.")
 
     # TRUCO DE MEMORIA: Evita que la tabla se borre al dar clic en el botón
     if "df_manual" not in st.session_state or st.session_state.get("prev_alt") != num_alt or st.session_state.get("prev_crit") != num_crit:
@@ -70,10 +76,10 @@ if modo == "Ingreso Manual":
 # ==========================================
 # MODO 2: SUBIR ARCHIVO EXCEL
 # ==========================================
-elif modo == "Subir Archivo Excel":
+elif modo == "Subir archivo Excel (.xlsx) de mi tabla":
     st.subheader("Sube tu archivo. No olvides poner nombres a tus Opciones y Criterios de evaluación 🧐.")
-    st.info("Si deseas que se agreguen automáticamente los Pesos, agrega una segunda hoja a tu archivo Excel con los valores en la columna A...")
-
+    st.info("Si deseas que se agreguen automáticamente los Pesos o Valores de importancia de tus Criterios de evaluación, debes agregar una segunda hoja a tu archivo Excel y en ella debes colocar el peso de tus criterios. NOTA: debes colocar de arriba a abajo (es decir, únicamente en la columna A) el peso de tus criterios, el primer peso que agregues será considerado el peso del criterio de evaluación 1, el segundo peso que agregues será considerado el peso del criterio de evaluación 2 y así sucesivamente. Cualquier duda contactar a: [Algún correo]")
+    st.info("Si deseas agregar tus Pesos manualmente sube tu archivo Excel con únicamente una Hoja que incluya tu tabla de decisión. Una vez cargado tu archivo, en el menú lateral podrás agregar manualmente tus Pesos o Valores de importancia por criterio.")
     uploaded_file = st.file_uploader("Selecciona un archivo .xlsx", type=["xlsx"])
 
     if uploaded_file:
@@ -147,7 +153,7 @@ if X_vals is not None:
         espacio_nota.warning(f"Llevas: {suma_actual:.2f} (Te faltan {1.0 - suma_actual:.2f})")
 
     # BOTÓN DE EJECUCIÓN
-    if st.button("Calcular VIKOR", type="primary"):
+    if st.button("Obtener Ranking de la o las mejores opciones", type="primary"):
 
         w_array = np.array(pesos)
         beneficio_array = np.array(impactos)
