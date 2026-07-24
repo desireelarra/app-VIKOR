@@ -21,8 +21,8 @@ st.markdown('El método VIKOR es una herramienta matemática que ayuda a elegir 
 # ==========================================
 # BARRA LATERAL (GLOBAL)
 # ==========================================
-st.sidebar.header("Valor de Utilidad grupal v")
-v = st.sidebar.slider("v es el peso de la estrategia de toma de decisiones “la mayoría de los criterios”", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
+st.sidebar.header("Valor de utilidad grupal v")
+#v = st.sidebar.slider("v es el peso de la estrategia de toma de decisiones “la mayoría de los criterios”", min_value=0.0, max_value=1.0, value=0.5, step=0.05)
 st.sidebar.divider()
 
 st.sidebar.header("Pesos o Valor de importancia")
