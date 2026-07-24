@@ -232,11 +232,11 @@ if X_vals is not None:
             st.subheader("Ranking Final (Menor Q es mejor)")
             st.dataframe(ranking.round(4).style.highlight_min(subset=['Q'], color='lightgreen'), use_container_width=True)
 
-        st.subheader("Análisis de Compromiso")
-        st.write(f"- **DQ (Límite C1):** {DQ:.4f}")
-        st.write(f"- **Q(a2) - Q(a1):** {(Q2 - Q1):.4f}")
-        st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
-        st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
+        #st.subheader("Análisis de Compromiso")
+        #st.write(f"- **DQ (Límite C1):** {DQ:.4f}")
+        #st.write(f"- **Q(a2) - Q(a1):** {(Q2 - Q1):.4f}")
+        #st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
+        #st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
 
         st.info(msg_compromiso)
         st.success(f"**Solución(es) recomendada(s):** {', '.join(compromiso)}")
