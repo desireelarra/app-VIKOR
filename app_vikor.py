@@ -238,5 +238,5 @@ if X_vals is not None:
         #st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
         #st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
 
-        st.info(msg_compromiso)
+        #st.info(msg_compromiso)
         st.success(f"**Solución(es) recomendada(s):** {', '.join(compromiso)}")
