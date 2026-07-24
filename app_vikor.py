@@ -154,89 +154,93 @@ if X_vals is not None:
 
     # BOTÓN DE EJECUCIÓN
     if st.button("Obtener Ranking de la o las mejores opciones", type="primary"):
-
-        w_array = np.array(pesos)
-        beneficio_array = np.array(impactos)
-
-        # PASO 1: Mejores y peores valores
-        f_star = np.zeros(len(criterios))
-        f_minus = np.zeros(len(criterios))
-
-        for j in range(len(criterios)):
-            if beneficio_array[j] == 1:
-                f_star[j] = np.max(X_vals[:, j])
-                f_minus[j] = np.min(X_vals[:, j])
-            else:
-                f_star[j] = np.min(X_vals[:, j])
-                f_minus[j] = np.max(X_vals[:, j])
-
-        divisor = f_star - f_minus
-        divisor[divisor == 0] = 1e-10
-
-        # PASO 2: Matriz F, S_i y R_i
-        F = (f_star - X_vals) / divisor
-        WF = F * w_array
-        S = WF.sum(axis=1)
-        R = WF.max(axis=1)
-
-        # PASO 3: Índice VIKOR (Q_i)
-        S_star, S_minus = S.min(), S.max()
-        R_star, R_minus = R.min(), R.max()
-
-        denom_S = (S_minus - S_star) if (S_minus - S_star) != 0 else 1e-10
-        denom_R = (R_minus - R_star) if (R_minus - R_star) != 0 else 1e-10
-
-        Q = v * (S - S_star) / denom_S + (1 - v) * (R - R_star) / denom_R
-
-        tabla_final = pd.DataFrame({"S": S, "R": R, "Q": Q}, index=alternativas)
-
-        # PASO 4 y 5: Ranking y Condición C1
-        ranking = tabla_final.sort_values("Q")
-        m = len(ranking)
-        DQ = 1 / (m - 1) if m > 1 else 0
-
-        a1 = ranking.index[0]
-        a2 = ranking.index[1] if m > 1 else a1
-        Q1 = ranking.iloc[0]["Q"]
-        Q2 = ranking.iloc[1]["Q"] if m > 1 else Q1
-
-        C1 = (Q2 - Q1) >= DQ
-
-        # PASO 6: Condición C2
-        mejor_S = tabla_final["S"].idxmin()
-        mejor_R = tabla_final["R"].idxmin()
-        C2 = (a1 == mejor_S) or (a1 == mejor_R)
-
-        # PASO 7 y 8: Solución de compromiso
-        if C1 and C2:
-            compromiso = [a1]
-            msg_compromiso = "Se cumplen C1 y C2. Existe una solución única."
-        elif C1 and not C2:
-            compromiso = [a1, a2]
-            msg_compromiso = "Se cumple C1 pero NO C2. La solución de compromiso incluye las dos mejores."
+        
+        # Validación estricta: Si no suma exactamente 1, arroja el error y no calcula nada.
+        if round(suma_actual, 2) != 1.00:
+            st.error(f"La suma de los pesos es {suma_actual:.2f}. Debe ser 1.0 para calcular el ranking")
         else:
-            compromiso = [alt for alt in ranking.index if ranking.loc[alt, "Q"] - Q1 < DQ]
-            msg_compromiso = "NO se cumple C1. Se ha generado un conjunto de soluciones de compromiso."
+            w_array = np.array(pesos)
+            beneficio_array = np.array(impactos)
 
-        # DESPLIEGUE DE RESULTADOS
-        st.divider()
-        st.header("Resultados VIKOR")
+            # PASO 1: Mejores y peores valores
+            f_star = np.zeros(len(criterios))
+            f_minus = np.zeros(len(criterios))
 
-        col_res1, col_res2 = st.columns(2)
-        with col_res1:
-            st.subheader("Valores Ideales")
-            df_ideales = pd.DataFrame({"f* (Mejor)": f_star, "f- (Peor)": f_minus}, index=criterios)
-            st.dataframe(df_ideales.round(4), use_container_width=True)
+            for j in range(len(criterios)):
+                if beneficio_array[j] == 1:
+                    f_star[j] = np.max(X_vals[:, j])
+                    f_minus[j] = np.min(X_vals[:, j])
+                else:
+                    f_star[j] = np.min(X_vals[:, j])
+                    f_minus[j] = np.max(X_vals[:, j])
 
-        with col_res2:
-            st.subheader("Ranking Final (Menor Q es mejor)")
-            st.dataframe(ranking.round(4).style.highlight_min(subset=['Q'], color='lightgreen'), use_container_width=True)
+            divisor = f_star - f_minus
+            divisor[divisor == 0] = 1e-10
 
-        #st.subheader("Análisis de Compromiso")
-        #st.write(f"- **DQ (Límite C1):** {DQ:.4f}")
-        #st.write(f"- **Q(a2) - Q(a1):** {(Q2 - Q1):.4f}")
-        #st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
-        #st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
+            # PASO 2: Matriz F, S_i y R_i
+            F = (f_star - X_vals) / divisor
+            WF = F * w_array
+            S = WF.sum(axis=1)
+            R = WF.max(axis=1)
 
-        #st.info(msg_compromiso)
-        st.success(f"**Solución(es) recomendada(s):** {', '.join(compromiso)}")
+            # PASO 3: Índice VIKOR (Q_i)
+            S_star, S_minus = S.min(), S.max()
+            R_star, R_minus = R.min(), R.max()
+
+            denom_S = (S_minus - S_star) if (S_minus - S_star) != 0 else 1e-10
+            denom_R = (R_minus - R_star) if (R_minus - R_star) != 0 else 1e-10
+
+            Q = v * (S - S_star) / denom_S + (1 - v) * (R - R_star) / denom_R
+
+            tabla_final = pd.DataFrame({"S": S, "R": R, "Q": Q}, index=alternativas)
+
+            # PASO 4 y 5: Ranking y Condición C1
+            ranking = tabla_final.sort_values("Q")
+            m = len(ranking)
+            DQ = 1 / (m - 1) if m > 1 else 0
+
+            a1 = ranking.index[0]
+            a2 = ranking.index[1] if m > 1 else a1
+            Q1 = ranking.iloc[0]["Q"]
+            Q2 = ranking.iloc[1]["Q"] if m > 1 else Q1
+
+            C1 = (Q2 - Q1) >= DQ
+
+            # PASO 6: Condición C2
+            mejor_S = tabla_final["S"].idxmin()
+            mejor_R = tabla_final["R"].idxmin()
+            C2 = (a1 == mejor_S) or (a1 == mejor_R)
+
+            # PASO 7 y 8: Solución de compromiso
+            if C1 and C2:
+                compromiso = [a1]
+                msg_compromiso = "Se cumplen C1 y C2. Existe una solución única."
+            elif C1 and not C2:
+                compromiso = [a1, a2]
+                msg_compromiso = "Se cumple C1 pero NO C2. La solución de compromiso incluye las dos mejores."
+            else:
+                compromiso = [alt for alt in ranking.index if ranking.loc[alt, "Q"] - Q1 < DQ]
+                msg_compromiso = "NO se cumple C1. Se ha generado un conjunto de soluciones de compromiso."
+
+            # DESPLIEGUE DE RESULTADOS
+            st.divider()
+            st.header("Resultados VIKOR")
+
+            col_res1, col_res2 = st.columns(2)
+            with col_res1:
+                st.subheader("Valores Ideales")
+                df_ideales = pd.DataFrame({"f* (Mejor)": f_star, "f- (Peor)": f_minus}, index=criterios)
+                st.dataframe(df_ideales.round(4), use_container_width=True)
+
+            with col_res2:
+                st.subheader("Ranking Final (Menor Q es mejor)")
+                st.dataframe(ranking.round(4).style.highlight_min(subset=['Q'], color='lightgreen'), use_container_width=True)
+
+            #st.subheader("Análisis de Compromiso")
+            #st.write(f"- **DQ (Límite C1):** {DQ:.4f}")
+            #st.write(f"- **Q(a2) - Q(a1):** {(Q2 - Q1):.4f}")
+            #st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
+            #st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
+
+            #st.info(msg_compromiso)
+            st.success(f"**Solución(es) recomendada(s):** {', '.join(compromiso)}")
