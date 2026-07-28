@@ -22,7 +22,7 @@ st.markdown('El método VIKOR es una herramienta matemática que ayuda a elegir 
 # BARRA LATERAL (GLOBAL)
 # ==========================================
 st.sidebar.header("Valor de utilidad grupal v")
-v = st.sidebar.slider("Deslice el slide al valor deseado:", min_value=0.0, max_value=1.0, value=0.5, step=0.5)
+v = st.sidebar.slider("Deslice el slide al valor deseado:", min_value=0.0, max_value=1.0, value=0.5, step=0.25)
 st.sidebar.divider()
 
 st.sidebar.header("Pesos o Valor de importancia")
