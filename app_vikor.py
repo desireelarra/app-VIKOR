@@ -55,22 +55,22 @@ if modo == "Agregar manualmente los datos de mi tabla":
 
     alternativas = [f"Opción {i+1}" for i in range(num_alt)]
     criterios = [f"Criterio {j+1}" for j in range(num_crit)]
-
-    df_vacio = pd.DataFrame(0.0, index=alternativas, columns=criterios)
-    df_vacio.insert(0, "Nombre de cada Opción", alternativas)
     
     st.subheader("Llena la siguiente tabla con tus datos correspondientes")
     st.info("Esta tabla recibe el nombre de: Matriz de decisión. Haz doble clic en cualquier celda para editar el valor que le designas a cada opción dado su criterio de evaluación. No olvides agregar nombre a tus opciones.")
 
     # TRUCO DE MEMORIA: Evita que la tabla se borre al dar clic en el botón
     if "df_manual" not in st.session_state or st.session_state.get("prev_alt") != num_alt or st.session_state.get("prev_crit") != num_crit:
-        st.session_state.df_manual = pd.DataFrame(np.zeros((num_alt, num_crit)), index=alternativas, columns=criterios)
+        df_ini = pd.DataFrame(np.zeros((num_alt, num_crit)), index=alternativas, columns=criterios)
+        df_ini.index.name = "Nombre de las opciones" # Asignamos el nombre por defecto a la columna de alternativas
+        st.session_state.df_manual = df_ini
         st.session_state.prev_alt = num_alt
         st.session_state.prev_crit = num_crit
 
     df_X = st.data_editor(st.session_state.df_manual, use_container_width=True, key="matriz_manual")
 
-    # Extraemos los datos tecleados
+    # Extraemos los datos tecleados y los nombres de opciones editados por el usuario
+    alternativas = df_X.index.tolist() 
     X_vals = df_X.values
 
 # ==========================================
@@ -87,6 +87,8 @@ elif modo == "Subir archivo Excel (.xlsx) de mi tabla":
 
         # MATRIZ (Primera hoja)
         df_subido = pd.read_excel(uploaded_file, sheet_name=0)
+        # Forzamos el nombre de la primera columna para mantener uniformidad
+        df_subido.rename(columns={df_subido.columns[0]: "Nombre de las opciones"}, inplace=True)
         st.success(f"Tabla cargada desde la hoja: '{excel_obj.sheet_names[0]}'")
         df_editado = st.data_editor(df_subido, hide_index=True, use_container_width=True, key="matriz_excel")
 
@@ -236,11 +238,4 @@ if X_vals is not None:
                 st.subheader("Ranking Final (Menor Q es mejor)")
                 st.dataframe(ranking.round(4).style.highlight_min(subset=['Q'], color='lightgreen'), use_container_width=True)
 
-            #st.subheader("Análisis de Compromiso")
-            #st.write(f"- **DQ (Límite C1):** {DQ:.4f}")
-            #st.write(f"- **Q(a2) - Q(a1):** {(Q2 - Q1):.4f}")
-            #st.write(f"- **Condición C1 (Ventaja):** {'✅' if C1 else '❌'}")
-            #st.write(f"- **Condición C2 (Estabilidad):** {'✅' if C2 else '❌'}")
-
-            #st.info(msg_compromiso)
             st.success(f"**Solución(es) recomendada(s):** {', '.join(compromiso)}")
